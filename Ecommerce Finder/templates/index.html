@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>E-Com Data Finder</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <style>
+    body {
+      background: linear-gradient(to right, #a8c5f5);
+    }
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #333;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .dropzone {
+      border: 2px dashed #cbd5e1;
+      padding: 20px;
+      text-align: center;
+      color: #1e293b;
+      cursor: pointer;
+      background-color: #f8fafc;
+    }
+    .dropzone.dragover {
+      border-color: #1e40af;
+      background-color: #dbeafe;
+    }
+    .section-card {
+      background-color: #f8fafc;
+      border: 1px solid #bfdbfe;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    .section-card {
+  background-color: #f8fafc;
+  border: 1px solid #bfdbfe;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  min-width: 0; /* <-- add this */
+}
+
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6 text-gray-800">
+  <div class="bg-white/90 backdrop-blur-md border border-blue-200 p-6 w-full max-w-6xl rounded-xl shadow-xl relative">
+    <h2 class="text-center text-3xl font-bold text-blue-900 mb-6">🔍 E-Com  Finder</h2>
+
+    <div id="progressBar" class="w-full bg-gray-200 rounded-full h-2 mb-4 hidden">
+      <div class="bg-blue-700 h-2 rounded-full" style="width: 0%;" id="progressFill"></div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Step 1 -->
+      <div class="section-card rounded-xl p-4">
+        <h3 class="font-semibold text-lg mb-4 text-blue-700">Step 1: Fetch Websites</h3>
+        <label class="block mb-1 text-sm">🌍 Country</label>
+        <input type="text" placeholder="e.g., India" class="w-full border rounded px-3 py-2 mb-3">
+        <label class="block mb-1 text-sm">🏙️ State/City Keyword</label>
+        <input type="text" placeholder="e.g., Bangalore" class="w-full border rounded px-3 py-2 mb-3">
+        <label class="block mb-1 text-sm">🏭 Industry Keyword</label>
+        <input type="text" placeholder="e.g., Electronics" class="w-full border rounded px-3 py-2 mb-3">
+        <label class="block mb-1 text-sm">🔢 Count</label>
+        <input type="number" placeholder="e.g., 100" class="w-full border rounded px-3 py-2 mb-4">
+        <button onclick="handleFetchWebsites()" class="w-full bg-blue-800 hover:bg-blue-900 transition text-white py-2 rounded flex justify-center items-center gap-2">
+          <span id="fetchWebsitesText">Fetch Websites</span>
+          <div id="fetchWebsitesSpinner" class="spinner hidden"></div>
+        </button>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="section-card rounded-xl p-4">
+        <h3 class="font-semibold text-lg mb-4 text-blue-700">Step 2: Filter Websites</h3>
+        <label class="flex items-center gap-2 mb-2">
+          <input type="checkbox" class="form-checkbox"> Domain Active
+        </label>
+        <label class="flex items-center gap-2 mb-2">
+          <input type="checkbox" class="form-checkbox"> Only Shopify websites
+        </label>
+        <label class="flex items-center gap-2 mb-4">
+          <input type="checkbox" class="form-checkbox"> Loads within 5 secs
+        </label>
+        <label class="block mb-2 text-sm">🚫 Exclude websites (CSV)</label>
+        <div id="dropzone" class="dropzone mb-4">Drag & drop CSV here or click</div>
+        <input type="file" id="fileInput" class="hidden">
+        <button onclick="handleApplyFilters()" class="w-full bg-blue-800 hover:bg-blue-900 transition text-white py-2 rounded flex justify-center items-center gap-2">
+          <span id="applyFiltersText">Apply Filters</span>
+          <div id="applyFiltersSpinner" class="spinner hidden"></div>
+        </button>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="section-card rounded-xl p-4">
+        <h3 class="font-semibold text-lg mb-4 text-blue-700">Step 3: Fetch Email IDs</h3>
+        <label class="block mb-2 text-sm">📁 Upload websites CSV</label>
+        <div id="emailDropzone" class="dropzone mb-4">Drag & drop CSV here or click</div>
+        <input type="file" id="emailFileInput" class="hidden">
+        <button onclick="handleFetchEmails()" class="w-full bg-blue-800 hover:bg-blue-900 transition text-white py-2 rounded flex justify-center items-center gap-2">
+          <span id="fetchEmailsText">Fetch Email IDs</span>
+          <div id="fetchEmailsSpinner" class="spinner hidden"></div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div class="mt-8">
+      <h4 class="font-semibold text-lg text-gray-800 mb-2">📋 Results</h4>
+      <p class="text-sm mb-4 text-gray-600">Website and Email data will appear here after processing.</p>
+      
+      <div class="mt-4 flex gap-3 flex-wrap" id="downloadLinksContainer">
+        <button class="bg-blue-800 hover:bg-blue-900 text-white px-4 py-2 rounded text-sm">⬇️ Export in CSV</button>
+         <a id="finalDownloadBtn" href="#" class="bg-blue-800 hover:bg-blue-900 text-white px-4 py-2 rounded text-sm hidden" download>
+          Download
+  </a>
+        <a href="/map?file=filtered_results.csv" target="_blank" class="bg-blue-800 hover:bg-blue-900 text-white px-4 py-2 rounded text-sm">
+  🗺️ View on Map
+</a>
+</div>
+<div class="max-w-full overflow-x-auto px-4"></div>
+<div id="fetchResultsContainer" class="mt-6"></div>
+<div id="filterResultsContainer" class="mt-6"></div>
+<div id="emailResultsContainer" class="mt-6"></div>
+</div>
+      </div>
+    </div>
+  
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script>
+  function showToast(message, type = "success") {
+    Toastify({
+      text: message,
+      duration: 3000,
+      gravity: "top",
+      position: "right",
+      backgroundColor: type === "error" ? "#f87171" : "#4ade80"
+    }).showToast();
+  }
+
+  function simulateAsyncAction(spinnerId, textId, callback) {
+    const spinner = document.getElementById(spinnerId);
+    const text = document.getElementById(textId);
+    const progress = document.getElementById("progressBar");
+    const progressFill = document.getElementById("progressFill");
+
+    spinner.classList.remove("hidden");
+    text.textContent = "Processing...";
+    progress.classList.remove("hidden");
+
+    let width = 0;
+    const interval = setInterval(() => {
+      if (width >= 100) {
+        clearInterval(interval);
+        spinner.classList.add("hidden");
+        text.textContent = textId.replace("Text", "").replace(/([A-Z])/g, " $1").trim();
+        progress.classList.add("hidden");
+        progressFill.style.width = "0%";
+        if (callback) callback();
+      } else {
+        width += 5;
+        progressFill.style.width = width + "%";
+      }
+    }, 100);
+  }
+
+  function createDownloadButton(filename, label = "Download CSV") {
+    const btn = document.createElement("a");
+    btn.href = `/download/${filename}`;
+    btn.textContent = `⬇️ ${label}`;
+    btn.className = "inline-block bg-blue-800 hover:bg-blue-900 text-white px-4 py-2 rounded text-sm";
+    return btn;
+  }
+
+  function handleFetchWebsites() {
+    const inputs = document.querySelectorAll('.section-card input[type="text"], .section-card input[type="number"]');
+    const [country, city, industry, count] = Array.from(inputs).map(i => i.value.trim());
+    const container = document.getElementById("fetchResultsContainer");
+    container.innerHTML = "";
+
+    simulateAsyncAction("fetchWebsitesSpinner", "fetchWebsitesText", () => {
+      fetch('/fetch_websites', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ country, city, industry, count })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          showToast("Websites fetched!");
+          const dlBtn = createDownloadButton(data.filename, "Download links.csv");
+          container.appendChild(dlBtn);
+          setFinalDownloadLink(data.filename);
+
+          fetch(`/download/${data.filename}`)
+            .then(res => res.text())
+            .then(csvText => showCSVTable(csvText, container));
+        } else {
+          showToast(data.error || "Failed to fetch websites", "error");
+        }
+      });
+    });
+  }
+
+  function handleApplyFilters() {
+    const checkboxes = document.querySelectorAll('.section-card:nth-child(2) input[type="checkbox"]');
+    const filters = {
+      domainActive: checkboxes[0].checked,
+      shopifyOnly: checkboxes[1].checked,
+      loadFast: checkboxes[2].checked,
+    };
+
+    const fileInput = document.getElementById("fileInput");
+    const file = fileInput.files[0];
+    if (!file) return showToast("Please upload a CSV file to exclude.", "error");
+
+    const spinner = document.getElementById("applyFiltersSpinner");
+    const text = document.getElementById("applyFiltersText");
+    const container = document.getElementById("filterResultsContainer");
+    container.innerHTML = "";
+
+    spinner.classList.remove("hidden");
+    text.textContent = "Applying...";
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('filters', JSON.stringify(filters));
+
+    fetch('/apply_filters', {
+      method: 'POST',
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      spinner.classList.add("hidden");
+      text.textContent = "Apply Filters";
+
+      if (data.success) {
+        showToast("Filters applied successfully!");
+        const dlBtn = createDownloadButton(data.filename, "Filtered Results CSV");
+        container.appendChild(dlBtn);
+        setFinalDownloadLink(data.filename);
+
+        fetch(`/download/${data.filename}`)
+          .then(res => res.text())
+          .then(csvText => showCSVTable(csvText, container));
+      } else {
+        showToast(data.error || "Failed to apply filters", "error");
+      }
+    })
+    .catch(() => {
+      spinner.classList.add("hidden");
+      text.textContent = "Apply Filters";
+      showToast("Network error during filtering", "error");
+    });
+  }
+
+  function handleFetchEmails() {
+    const spinner = document.getElementById("fetchEmailsSpinner");
+    const text = document.getElementById("fetchEmailsText");
+    const fileInput = document.getElementById("emailFileInput");
+    const file = fileInput.files[0];
+    const container = document.getElementById("emailResultsContainer");
+    container.innerHTML = "";
+
+    if (!file) return showToast("Upload websites CSV first.", "error");
+
+    spinner.classList.remove("hidden");
+    text.textContent = "Fetching Emails...";
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    fetch("/fetch_emails", {
+      method: "POST",
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      spinner.classList.add("hidden");
+      text.textContent = "Fetch Email IDs";
+
+      if (data.success) {
+        showToast("Emails fetched successfully!");
+        const dlBtn = createDownloadButton(data.filename, "Emails CSV");
+        container.appendChild(dlBtn);
+        setFinalDownloadLink(data.filename);
+
+        fetch(`/download/${data.filename}`)
+          .then(res => res.text())
+          .then(csvText => showCSVTable(csvText, container));
+      } else {
+        showToast(data.error || "Failed to fetch emails", "error");
+      }
+    })
+    .catch(() => {
+      spinner.classList.add("hidden");
+      text.textContent = "Fetch Email IDs";
+      showToast("Network error while fetching emails", "error");
+    });
+  }
+
+  // Drag and Drop Support
+  function setupDropzone(dropId, inputId) {
+    const dropzone = document.getElementById(dropId);
+    const input = document.getElementById(inputId);
+
+    dropzone.addEventListener("click", () => input.click());
+    dropzone.addEventListener("dragover", e => { e.preventDefault(); dropzone.classList.add("dragover"); });
+    dropzone.addEventListener("dragleave", () => dropzone.classList.remove("dragover"));
+    dropzone.addEventListener("drop", e => {
+      e.preventDefault(); dropzone.classList.remove("dragover");
+      const file = e.dataTransfer.files[0];
+      if (file) {
+        input.files = e.dataTransfer.files;
+        showToast(`${file.name} uploaded`);
+      }
+    });
+
+    input.addEventListener("change", e => {
+      const file = e.target.files[0];
+      if (file) showToast(`${file.name} uploaded`);
+    });
+  }
+
+  setupDropzone("dropzone", "fileInput");
+  setupDropzone("emailDropzone", "emailFileInput");
+  function parseCSV(text) {
+    const rows = [];
+    const regex = /("([^"]|"")*"|[^,\r\n]+|)(?=,|\r?\n|$)/g;
+    let row = [];
+    let match;
+
+    const lines = text.split(/\r?\n/);
+    for (let line of lines) {
+      const matches = [...line.matchAll(regex)].map(m => m[0]);
+      const parsedRow = matches.map(cell =>
+        cell.startsWith('"') && cell.endsWith('"')
+          ? cell.slice(1, -1).replace(/""/g, '"')
+          : cell
+      );
+      if (parsedRow.length > 1 || (parsedRow.length === 1 && parsedRow[0] !== '')) {
+        rows.push(parsedRow);
+      }
+    }
+    return rows;
+  }
+
+ function showCSVTable(csvText, container) {
+  container.innerHTML = ""; // Clear previous content
+
+  const rows = parseCSV(csvText);
+  if (rows.length === 0) return;
+
+  // White card container (fixed width, responsive)
+  const outerBox = document.createElement("div");
+  outerBox.className = "bg-white rounded-xl border border-gray-300 shadow p-4 mt-4 w-full max-w-full";
+
+  // Horizontal scroll container inside white box
+  const scrollWrapper = document.createElement("div");
+  scrollWrapper.className = "overflow-x-auto w-full";
+
+  // Table
+  const table = document.createElement("table");
+  table.className = "w-full table-auto text-sm text-left border-collapse";
+
+  // Header
+  const thead = document.createElement("thead");
+  const headerRow = document.createElement("tr");
+  headerRow.className = "bg-gray-100";
+  rows[0].forEach(cell => {
+    const th = document.createElement("th");
+    th.className = "border px-4 py-2 font-medium whitespace-nowrap";
+    th.textContent = cell;
+    headerRow.appendChild(th);
+  });
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+
+  // Body
+  const tbody = document.createElement("tbody");
+  rows.slice(1).forEach(cols => {
+    const row = document.createElement("tr");
+    cols.forEach(c => {
+      const td = document.createElement("td");
+      td.className = "border px-4 py-2 whitespace-nowrap";
+      td.textContent = c;
+      row.appendChild(td);
+    });
+    tbody.appendChild(row);
+  });
+
+  table.appendChild(tbody);
+  scrollWrapper.appendChild(table);
+  outerBox.appendChild(scrollWrapper);
+  container.appendChild(outerBox);
+}
+
+function setFinalDownloadLink(filename) {
+  const finalBtn = document.getElementById("finalDownloadBtn");
+  finalBtn.href = `/download/${filename}`;
+  finalBtn.classList.remove("hidden");
+}
+
+</script>
+
+
+</body>
+</html>

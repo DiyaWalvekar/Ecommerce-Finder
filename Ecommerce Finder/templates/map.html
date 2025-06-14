@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Company Map</title>
+  <style>
+    #map {
+      height: 90vh;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <h2>Company Locations Map</h2>
+  <div id="map"></div>
+
+  <script>
+    async function initMap() {
+      const response = await fetch("/map_data");
+      const companies = await response.json();
+
+      const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 5,
+        center: { lat: companies[0].lat, lng: companies[0].lng },
+      });
+
+      companies.forEach(company => {
+        const marker = new google.maps.Marker({
+          position: { lat: company.lat, lng: company.lng },
+          map: map,
+          title: company.name,
+        });
+
+        const infoWindow = new google.maps.InfoWindow({
+          content: `<strong>${company.name}</strong><br><a href="${company.url}" target="_blank">Visit Site</a>`,
+        });
+
+        marker.addListener("click", () => infoWindow.open(map, marker));
+      });
+    }
+  </script>
+
+  <script async
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDdyNiVH_7o3UOdtJoP0wDAI8WJjIM7yUs&callback=initMap">
+  </script>
+</body>
+</html>

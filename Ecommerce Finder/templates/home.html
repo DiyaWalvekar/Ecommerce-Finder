@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EcommerceFinder</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif']
+          },
+          animation: {
+            fadeIn: 'fadeIn 1.2s ease-out forwards',
+            popIn: 'popIn 0.6s ease-out forwards',
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: 0, transform: 'translateY(40px)' },
+              '100%': { opacity: 1, transform: 'translateY(0)' },
+            },
+            popIn: {
+              '0%': { transform: 'scale(0.9)', opacity: 0 },
+              '100%': { transform: 'scale(1)', opacity: 1 },
+            },
+          },
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body class="font-sans bg-gradient-to-br from-blue-50 via-indigo-100 to-indigo-200 dark:from-gray-900 dark:to-gray-800 min-h-screen flex flex-col transition-all duration-300">
+
+  <!-- Header -->
+  <header class="bg-white dark:bg-gray-900 shadow-md py-5 px-10 flex justify-between items-center sticky top-0 z-20">
+    <div class="flex items-center space-x-3">
+      <div class="text-indigo-600 dark:text-indigo-400 text-3xl animate-bounce">🛍️🔍</div>
+      <span class="text-2xl sm:text-3xl font-extrabold text-indigo-700 dark:text-white">EcommerceFinder</span>
+    </div>
+    <div class="flex items-center space-x-4">
+      <a href="{{ url_for('login') }}" class="text-indigo-700 dark:text-indigo-300 font-medium hover:text-indigo-900 dark:hover:text-white transition">Login</a>
+      <a href="{{ url_for('signup') }}" class="bg-indigo-600 text-white px-5 py-2 rounded-xl shadow-md hover:bg-indigo-700 transition font-semibold">Sign Up</a>
+      <button onclick="document.documentElement.classList.toggle('dark')" class="text-xl hover:scale-110 transition" title="Toggle Dark Mode">🌙</button>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <main class="flex-grow flex items-center justify-center px-6 py-20 animate-fadeIn">
+    <div class="max-w-4xl text-center space-y-8">
+      <h1 class="text-4xl sm:text-5xl font-extrabold text-indigo-800 dark:text-white drop-shadow-lg">Explore the Web of E-commerce</h1>
+      <p class="text-lg sm:text-xl text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">Extract emails, detect Shopify stores, check live domains, and map store locations — all with the power of AI.</p>
+    </div>
+  </main>
+
+  <!-- Features -->
+  <section class="bg-white dark:bg-gray-900 py-16 shadow-inner">
+    <div class="max-w-6xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 text-center">
+      <div class="bg-gradient-to-tr from-indigo-100 to-white dark:from-gray-800 dark:to-gray-700 p-8 rounded-3xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition duration-300 animate-popIn">
+        <div class="text-4xl mb-4">📧</div>
+        <h3 class="text-xl font-bold text-indigo-700 dark:text-indigo-300 mb-2">Email Extractor</h3>
+        <p class="text-gray-600 dark:text-gray-400">Find contact details directly from websites in seconds.</p>
+      </div>
+      <div class="bg-gradient-to-tr from-indigo-100 to-white dark:from-gray-800 dark:to-gray-700 p-8 rounded-3xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition duration-300 animate-popIn">
+        <div class="text-4xl mb-4">🛒</div>
+        <h3 class="text-xl font-bold text-indigo-700 dark:text-indigo-300 mb-2">Shopify Detector</h3>
+        <p class="text-gray-600 dark:text-gray-400">Instantly identify if a store is powered by Shopify.</p>
+      </div>
+      <div class="bg-gradient-to-tr from-indigo-100 to-white dark:from-gray-800 dark:to-gray-700 p-8 rounded-3xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition duration-300 animate-popIn">
+        <div class="text-4xl mb-4">🗺️</div>
+        <h3 class="text-xl font-bold text-indigo-700 dark:text-indigo-300 mb-2">Location Mapping</h3>
+        <p class="text-gray-600 dark:text-gray-400">See where stores are based with map visualizations.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="bg-indigo-100 dark:bg-gray-800 py-16">
+    <div class="max-w-4xl mx-auto text-center space-y-10">
+      <h2 class="text-3xl font-bold text-indigo-800 dark:text-white">What Our Users Say</h2>
+      <blockquote class="text-gray-700 dark:text-gray-300 italic">"This tool helped me find Shopify stores and reach out in no time. Absolutely worth it!" <br><span class="font-semibold text-indigo-700">— Aishwarya, Marketer</span></blockquote>
+      <blockquote class="text-gray-700 dark:text-gray-300 italic">"A powerful AI-backed platform that feels intuitive and fun to use!" <br><span class="font-semibold text-indigo-700">— Rahul, Data Analyst</span></blockquote>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-white dark:bg-gray-800 text-center text-sm text-indigo-600 dark:text-indigo-300 py-6 shadow-inner mt-auto">
+    &copy; 2025 <span class="font-semibold">EcommerceFinder</span>. All rights reserved.
+  </footer>
+
+</body>
+</html>
