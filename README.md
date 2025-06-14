@@ -117,6 +117,7 @@ Install via:
 
 
 pip install -r requirements.txt
+
 🧑‍💻 Author
 Diya Walvekar
 Student @ KLE Institute of Technology
