@@ -62,7 +62,7 @@ ecommerce-data-finder/
 🔧 Setup Instructions
 
 1. Clone and install dependencies
-git clone https://github.com/DiyaWalvekar/ecommerce-data-finder.git
+git clone https://github.com/DiyaWalvekar/Ecommerce-Finder.git
 cd ecommerce-data-finder
 pip install -r requirements.txt
 
